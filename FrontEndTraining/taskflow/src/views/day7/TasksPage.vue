@@ -50,7 +50,10 @@
               @ionChange="toggleTask(task.id)"
               @click.stop
             />
-            <IonLabel 
+            <IonThumbnail v-if="task.photo" slot="start" class="task-thumbnail">
+              <IonImg :src="task.photo" />
+            </IonThumbnail>
+            <IonLabel
               :class="{ 'task-done': task.done }"
             >
               {{ task.name }}
@@ -79,27 +82,32 @@
     </IonContent>
   </IonPage>
 </template>
+
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useTaskStore } from '../../stores/taskStore'
 import {
-  IonPage, IonHeader, IonToolbar, IonTitle, IonContent, 
-  IonItem, IonLabel, IonInput, IonButton, IonCheckbox, 
-  IonList, IonText, IonChip, IonIcon, IonFab, IonFabButton
+  IonPage, IonHeader, IonToolbar, IonTitle, IonContent,
+  IonItem, IonLabel, IonInput, IonButton, IonCheckbox,
+  IonList, IonText, IonChip, IonIcon, IonFab, IonFabButton,
+  IonThumbnail, IonImg
 } from '@ionic/vue'
 import { trashOutline, add } from 'ionicons/icons'
+
 const router = useRouter()
 const taskStore = useTaskStore()
 const { tasks, doneCount, pendingCount, totalCount } = storeToRefs(taskStore)
 const { addTask, toggleTask, removeTask } = taskStore
 const newTaskName = ref('')
+
 function handleAdd() {
   if (!newTaskName.value.trim()) return
   addTask(newTaskName.value)
   newTaskName.value = ''
 }
+
 function goToDetail(id) {
   router.push(`/tabs/tasks/${id}`)
 }
@@ -139,6 +147,11 @@ function goToDetail(id) {
   margin-bottom: 10px;
   box-shadow: 0 3px 10px rgba(0,0,0,0.05);
   cursor: pointer;
+}
+.task-thumbnail {
+  --size: 50px;
+  --border-radius: 8px;
+  margin-right: 8px;
 }
 .task-done {
   text-decoration: line-through;

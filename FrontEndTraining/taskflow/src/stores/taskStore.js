@@ -30,6 +30,14 @@ export const useTaskStore = defineStore('tasks', () => {
     tasks.value = tasks.value.filter(task => task.id !== id);
   }
 
+  function addPhotoToTask(taskId, path){
+    const task = tasks.value.find(task => task.id === taskId);
+
+    if(task){
+        task.photo = path
+    }
+  }
+
    return {
     tasks,
     nextId,
@@ -38,6 +46,7 @@ export const useTaskStore = defineStore('tasks', () => {
     pendingCount,
     addTask,
     toggleTask,
-    removeTask
+    removeTask,
+    addPhotoToTask
   }
 })
