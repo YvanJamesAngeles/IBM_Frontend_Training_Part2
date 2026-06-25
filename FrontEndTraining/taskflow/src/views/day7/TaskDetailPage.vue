@@ -80,7 +80,7 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useTaskStore } from '../../stores/taskStore'
-import { Camera, CameraResultType } from '@capacitor/camera'
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent,
   IonButtons, IonBackButton, IonCard, IonCardHeader,
@@ -102,17 +102,18 @@ const task = computed(() => {
 
 async function handleTakePhoto() {
   try {
-    const photo = await Camera.takePhoto({
+    const photo = await Camera.getPhoto({
       quality: 90,
       allowEditing: false,
-      resultType: CameraResultType.Uri
+      resultType: CameraResultType.DataUrl,
+      source: CameraSource.Photos
     })
-    
-    if (photo.webPath) {
-      addPhotoToTask(taskId.value, photo.webPath)
+
+    if (photo.dataUrl) {
+      addPhotoToTask(taskId.value, photo.dataUrl)
     }
   } catch (error) {
-    console.error('Error taking photo:', error)
+    console.error('Error picking photo:', error)
   }
 }
 

@@ -41,6 +41,8 @@ const pinia = createPinia()
 app.use(IonicVue)
 app.use(router)
 app.use(pinia)
-router.isReady().then(() => {
-app.mount('#app')
+router.isReady().then(async () => {
+  const { useTaskStore } = await import('./stores/taskStore')
+  await useTaskStore().loadTasks()
+  app.mount('#app')
 })

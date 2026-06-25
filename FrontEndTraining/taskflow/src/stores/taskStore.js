@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { Preferences } from '@capacitor/preferences'
 
 export const useTaskStore = defineStore('tasks', () => {
   const tasks  = ref([])
@@ -9,6 +10,29 @@ export const useTaskStore = defineStore('tasks', () => {
   const doneCount    = computed(() =>  tasks.value.filter(task => task.done).length)
   const pendingCount = computed(() => tasks.value.filter(task => !task.done).length)
 
+  async function saveTasks() {
+    await Preferences.set({
+      key: 'tasks',
+      value: JSON.stringify(tasks.value)
+    })
+    await Preferences.set({
+      key: 'nextId',
+      value: JSON.stringify(nextId.value)
+    })
+  }
+
+  async function loadTasks() {
+    const tasksData = await Preferences.get({ key: 'tasks' })
+    const nextIdData = await Preferences.get({ key: 'nextId' })
+    
+    if (tasksData.value) {
+      tasks.value = JSON.parse(tasksData.value)
+    }
+    if (nextIdData.value) {
+      nextId.value = JSON.parse(nextIdData.value)
+    }
+  }
+
   function addTask(name) {
     if (!name || name.trim() === '') return
     tasks.value.push({
@@ -16,6 +40,7 @@ export const useTaskStore = defineStore('tasks', () => {
       name,
       done: false
     })
+    saveTasks()
   }
 
   function toggleTask(id) {
@@ -23,11 +48,13 @@ export const useTaskStore = defineStore('tasks', () => {
 
     if(task){
         task.done = !task.done
+        saveTasks()
     }
   }
 
   function removeTask(id) {
     tasks.value = tasks.value.filter(task => task.id !== id);
+    saveTasks()
   }
 
   function addPhotoToTask(taskId, path){
@@ -35,6 +62,7 @@ export const useTaskStore = defineStore('tasks', () => {
 
     if(task){
         task.photo = path
+        saveTasks()
     }
   }
 
@@ -47,6 +75,8 @@ export const useTaskStore = defineStore('tasks', () => {
     addTask,
     toggleTask,
     removeTask,
-    addPhotoToTask
+    addPhotoToTask,
+    saveTasks,
+    loadTasks
   }
 })
